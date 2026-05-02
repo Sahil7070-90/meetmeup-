@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MeetMeUp — Meet Strangers Instantly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --card: #1a1a24;
+      --border: #2a2a3a;
+      --accent: #00e5ff;
+      --accent2: #ff4d6d;
+      --text: #f0f0f8;
+      --muted: #6b6b8a;
+      --glow: 0 0 30px rgba(0,229,255,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 20% 20%, rgba(0,229,255,0.04) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, rgba(255,77,109,0.04) 0%, transparent 50%);
+      animation: bgPulse 8s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes bgPulse {
+      0% { transform: scale(1) rotate(0deg); }
+      100% { transform: scale(1.1) rotate(5deg); }
+    }
+
+    /* ===== LANDING PAGE ===== */
+    #landing {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .logo span:first-child { color: var(--text); }
+    .logo .accent { color: var(--accent); }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    .online-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: 100px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 2.5rem;
+      font-weight: 500;
+    }
+
+    .online-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .btn-start {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 52px;
+      font-size: 1.1rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 40px rgba(0,229,255,0.3);
+      letter-spacing: 0.5px;
+    }
+
+    .btn-start:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 60px rgba(0,229,255,0.5);
+    }
+
+    .btn-start:active { transform: scale(0.98); }
+
+    .features {
+      display: flex;
+      gap: 2rem;
+      margin-top: 4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .feature-icon { font-size: 1.1rem; }
+
+    /* ===== CHAT PAGE ===== */
+    #chat-page {
+      display: none;
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .topbar-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .topbar-logo .accent { color: var(--accent); }
+
+    .topbar-status {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .status-dot.green { background: #00e676; box-shadow: 0 0 8px #00e676; }
+    .status-dot.yellow { background: #ffeb3b; box-shadow: 0 0 8px #ffeb3b; animation: blink 1s infinite; }
+
+    /* Main content */
+    .main-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Video area */
+    .video-area {
+      flex: 1;
+      background: #000;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #remote-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #local-video {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 180px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+
+    /* Status overlay on video */
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      z-index: 5;
+      transition: opacity 0.4s;
+    }
+
+    .video-overlay.hidden { display: none; }
+
+    .overlay-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .overlay-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .overlay-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Controls */
+    .controls {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .ctrl-btn {
+      padding: 12px 28px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.25s;
+    }
+
+    .btn-next {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0,229,255,0.3);
+    }
+
+    .btn-next:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(0,229,255,0.5);
+    }
+
+    .btn-stop {
+      background: var(--accent2);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255,77,109,0.2);
+    }
+
+    .btn-stop:hover { transform: scale(1.05); }
+
+    .btn-mute {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-mute:hover { background: var(--border); }
+
+    /* Chat sidebar */
+    .chat-sidebar {
+      width: 320px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .chat-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg.you {
+      background: var(--accent);
+      color: #000;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      font-weight: 500;
+    }
+
+    .msg.stranger {
+      background: var(--card);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg.system {
+      background: transparent;
+      color: var(--muted);
+      align-self: center;
+      font-size: 0.78rem;
+      padding: 4px 0;
+      font-style: italic;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-input::placeholder { color: var(--muted); }
+
+    .send-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      font-weight: 700;
+    }
+
+    .send-btn:hover { transform: scale(1.05); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .chat-sidebar { display: none; }
+      #local-video { width: 120px; height: 80px; }
+    }
+
+    /* Fade in animation */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== LANDING PAGE ===== -->
+<div id="landing" class="fade-in">
+  <div class="logo">
+    <span>Meet</span><span class="accent">MeUp</span>
+  </div>
+  <p class="tagline">Talk to random strangers from around the world — instantly.</p>
+
+  <div class="online-badge">
+    <div class="online-dot"></div>
+    <span id="online-count">0</span> people online right now
+  </div>
+
+  <button class="btn-start" onclick="startChat()">
+    Start Chatting →
+  </button>
+
+  <div class="features">
+    <div class="feature"><span class="feature-icon">🎥</span> Video & Audio</div>
+    <div class="feature"><span class="feature-icon">💬</span> Text Chat</div>
+    <div class="feature"><span class="feature-icon">⚡</span> Instant Match</div>
+    <div class="feature"><span class="feature-icon">🔒</span> Anonymous</div>
+  </div>
+</div>
+
+<!-- ===== CHAT PAGE ===== -->
+<div id="chat-page">
+  <div class="topbar">
+    <div class="topbar-logo">Meet<span class="accent">MeUp</span></div>
+    <div class="topbar-status">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Connecting...</span>
+    </div>
+    <div class="online-badge" style="margin:0; font-size:0.8rem;">
+      <div class="online-dot"></div>
+      <span id="online-count-chat">0</span> online
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Video -->
+    <div class="video-area">
+      <video id="remote-video" autoplay playsinline></video>
+      <video id="local-video" autoplay playsinline muted></video>
+
+      <!-- Overlays -->
+      <div class="video-overlay" id="overlay-idle">
+        <div class="overlay-icon">👋</div>
+        <div class="overlay-title">Ready to Meet?</div>
+        <div class="overlay-sub">Click "Next" to find a stranger</div>
+      </div>
+
+      <div class="video-overlay hidden" id="overlay-searching">
+        <div class="spinner"></div>
+        <div class="overlay-title">Finding someone...</div>
+        <div class="overlay-sub">Please wait a moment</div>
+      </div>
+
+      <div class="video-overlay hidden" id="overlay-left">
+        <div class="overlay-icon">👋</div>
+        <div class="overlay-title">Stranger left</div>
+        <div class="overlay-sub">Click "Next" to find someone new</div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="ctrl-btn btn-mute" id="mute-btn" onclick="toggleMute()">🎤 Mute</button>
+        <button class="ctrl-btn btn-next" id="next-btn" onclick="findStranger()">⚡ Next</button>
+        <button class="ctrl-btn btn-stop" onclick="stopAndGoHome()">✕ Stop</button>
+      </div>
+    </div>
+
+    <!-- Chat sidebar -->
+    <div class="chat-sidebar">
+      <div class="chat-header">💬 Chat</div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg system">Connect with someone to start chatting!</div>
+      </div>
+      <div class="chat-input-area">
+        <input
+          class="chat-input"
+          id="chat-input"
+          type="text"
+          placeholder="Type a message..."
+          maxlength="300"
+          onkeydown="if(event.key==='Enter') sendMessage()"
+        />
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Socket.io & PeerJS -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+<script>
+  const socket = io();
+  let peer = null;
+  let localStream = null;
+  let currentCall = null;
+  let isMuted = false;
+  let isConnected = false;
+
+  // Online count
+  socket.on("online-count", (count) => {
+    document.getElementById("online-count").textContent = count;
+    document.getElementById("online-count-chat").textContent = count;
+  });
+
+  // ---- Start Chat ----
+  async function startChat() {
+    // Get camera/mic
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      document.getElementById("local-video").srcObject = localStream;
+    } catch (e) {
+      alert("Camera/Mic access needed! Please allow it and try again.");
+      return;
+    }
+
+    // Init PeerJS
+    peer = new Peer(undefined, {
+      host: location.hostname,
+      port: location.port || (location.protocol === 'https:' ? 443 : 80),
+      path: "/peerjs",
+      secure: location.protocol === 'https:'
+    });
+
+    peer.on("open", (id) => {
+      console.log("My peer ID:", id);
+      // Show chat page
+      document.getElementById("landing").style.display = "none";
+      const chatPage = document.getElementById("chat-page");
+      chatPage.style.display = "flex";
+      chatPage.style.flexDirection = "column";
+
+      setStatus("yellow", "Looking for someone...");
+      findStranger();
+    });
+
+    peer.on("call", (call) => {
+      currentCall = call;
+      call.answer(localStream);
+      call.on("stream", (remoteStream) => {
+        document.getElementById("remote-video").srcObject = remoteStream;
+        showOverlay(null); // hide overlay
+        isConnected = true;
+      });
+      call.on("close", () => handlePartnerLeft());
+    });
+
+    peer.on("error", (err) => {
+      console.error("PeerJS error:", err);
+    });
+  }
+
+  // ---- Find Stranger ----
+  function findStranger() {
+    isConnected = false;
+    if (currentCall) { currentCall.close(); currentCall = null; }
+    showOverlay("overlay-searching");
+    addSystemMsg("Looking for a stranger...");
+    setStatus("yellow", "Searching...");
+    socket.emit("find-stranger");
+  }
+
+  // ---- Matched! ----
+  socket.on("matched", ({ partnerId, initiator }) => {
+    addSystemMsg("✅ Connected with a stranger!");
+    setStatus("green", "Connected");
+    showOverlay(null);
+
+    if (initiator) {
+      const call = peer.call(partnerId, localStream);
+      currentCall = call;
+      call.on("stream", (remoteStream) => {
+        document.getElementById("remote-video").srcObject = remoteStream;
+        isConnected = true;
+      });
+      call.on("close", () => handlePartnerLeft());
+    }
+  });
+
+  socket.on("waiting", () => {
+    showOverlay("overlay-searching");
+    setStatus("yellow", "Waiting for match...");
+  });
+
+  // ---- Partner left ----
+  socket.on("partner-left", () => handlePartnerLeft());
+
+  function handlePartnerLeft() {
+    if (isConnected) {
+      addSystemMsg("👋 Stranger disconnected.");
+    }
+    isConnected = false;
+    document.getElementById("remote-video").srcObject = null;
+    showOverlay("overlay-left");
+    setStatus("yellow", "Stranger left");
+  }
+
+  socket.on("skipped", () => {
+    addSystemMsg("Skipped. Finding next...");
+  });
+
+  // ---- Chat ----
+  function sendMessage() {
+    const input = document.getElementById("chat-input");
+    const msg = input.value.trim();
+    if (!msg) return;
+    if (!isConnected) {
+      addSystemMsg("⚠️ Not connected to anyone yet.");
+      return;
+    }
+    socket.emit("chat-message", msg);
+    addMsg(msg, "you");
+    input.value = "";
+  }
+
+  socket.on("chat-message", ({ text }) => {
+    addMsg(text, "stranger");
+  });
+
+  function addMsg(text, type) {
+    const div = document.createElement("div");
+    div.className = `msg ${type}`;
+    div.textContent = text;
+    const container = document.getElementById("chat-messages");
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function addSystemMsg(text) {
+    const div = document.createElement("div");
+    div.className = "msg system";
+    div.textContent = text;
+    const container = document.getElementById("chat-messages");
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  // ---- Mute ----
+  function toggleMute() {
+    if (!localStream) return;
+    isMuted = !isMuted;
+    localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+    document.getElementById("mute-btn").textContent = isMuted ? "🔇 Unmute" : "🎤 Mute";
+  }
+
+  // ---- Stop ----
+  function stopAndGoHome() {
+    socket.emit("skip");
+    if (currentCall) { currentCall.close(); currentCall = null; }
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+    if (peer) { peer.destroy(); peer = null; }
+    document.getElementById("chat-page").style.display = "none";
+    document.getElementById("landing").style.display = "flex";
+  }
+
+  // ---- Helpers ----
+  function showOverlay(id) {
+    ["overlay-idle", "overlay-searching", "overlay-left"].forEach(oid => {
+      const el = document.getElementById(oid);
+      if (el) el.classList.toggle("hidden", oid !== id);
+    });
+  }
+
+  function setStatus(color, text) {
+    const dot = document.getElementById("status-dot");
+    dot.className = `status-dot ${color}`;
+    document.getElementById("status-text").textContent = text;
+  }
+</script>
+</body>
+</html>
