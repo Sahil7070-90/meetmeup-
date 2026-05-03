@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MeetMeUp Admin v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#08080f;--surface:#111118;--card:#18181f;--border:#252530;--accent:#00e5ff;--accent2:#ff4d6d;--green:#00e676;--yellow:#ffeb3b;--text:#f0f0f8;--muted:#5a5a7a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.lbox{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;width:360px;text-align:center;}
+.lbox h1{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:6px;}
+.lbox h1 span{color:var(--accent);}
+.lbox p{color:var(--muted);font-size:.9rem;margin-bottom:28px;}
+.inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-size:.95rem;outline:none;margin-bottom:14px;transition:border-color .2s;}
+.inp:focus{border-color:var(--accent);}
+.lbtn{width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all .2s;}
+.lbtn:hover{transform:scale(1.02);box-shadow:0 0 30px rgba(0,229,255,.3);}
+#dash{display:none;padding:24px;max-width:1200px;margin:0 auto;}
+.dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.dh h1{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;}
+.dh h1 span{color:var(--accent);}
+.btns-row{display:flex;gap:10px;}
+.rbtn{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--accent);padding:9px 18px;border-radius:10px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.rbtn:hover{background:rgba(0,229,255,.2);}
+.outbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:9px 18px;border-radius:10px;cursor:pointer;font-size:.85rem;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.sc .lbl{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.sc .val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;}
+.val.blue{color:var(--accent)}.val.green{color:var(--green)}.val.yellow{color:var(--yellow)}.val.red{color:var(--accent2)}.val.purple{color:#c084fc;}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;}
+.sec-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:10px 12px;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);}
+td{padding:10px 12px;font-size:.86rem;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:700;}
+.badge.red{background:rgba(255,77,109,.15);color:var(--accent2);}
+.badge.green{background:rgba(0,230,118,.12);color:var(--green);}
+.badge.yellow{background:rgba(255,235,59,.12);color:var(--yellow);}
+.ban-btn{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.2);color:var(--accent2);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.78rem;transition:all .2s;}
+.ban-btn:hover{background:rgba(255,77,109,.25);}
+.unban-btn{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);color:var(--green);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.78rem;}
+.none{color:var(--muted);text-align:center;padding:24px 0;font-size:.88rem;}
+.live-b{display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2);border-radius:100px;padding:4px 12px;font-size:.75rem;color:var(--green);}
+.ld{width:6px;height:6px;background:var(--green);border-radius:50%;animation:p 1.5s infinite;}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.upd{color:var(--muted);font-size:.75rem;margin-top:4px;}
+.qlinks{display:flex;gap:10px;flex-wrap:wrap;}
+.ql{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:10px;text-decoration:none;font-size:.85rem;transition:all .2s;}
+.ql:hover{border-color:var(--accent);color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div id="login-page">
+  <div class="lbox">
+    <h1>Meet<span>MeUp</span></h1>
+    <p>Admin Panel — Sirf aapke liye</p>
+    <input class="inp" type="password" id="pwd" placeholder="Admin password..." onkeydown="if(event.key==='Enter')login()"/>
+    <button class="lbtn" onclick="login()">Login →</button>
+    <div id="err" style="color:var(--accent2);font-size:.82rem;margin-top:10px;display:none;">❌ Galat password!</div>
+  </div>
+</div>
+
+<div id="dash">
+  <div class="dh">
+    <div>
+      <h1>Meet<span>MeUp</span> Admin</h1>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+        <div class="live-b"><div class="ld"></div>Live</div>
+        <div class="upd" id="upd">Loading...</div>
+      </div>
+    </div>
+    <div class="btns-row">
+      <button class="rbtn" onclick="load()">🔄 Refresh</button>
+      <button class="outbtn" onclick="out()">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="sc"><div class="lbl">👥 Online Abhi</div><div class="val blue" id="s1">—</div></div>
+    <div class="sc"><div class="lbl">👤 Total Users</div><div class="val green" id="s2">—</div></div>
+    <div class="sc"><div class="lbl">🔗 Connections</div><div class="val yellow" id="s3">—</div></div>
+    <div class="sc"><div class="lbl">💬 Total Chats</div><div class="val purple" id="s4">—</div></div>
+    <div class="sc"><div class="lbl">🎥 Video Queue</div><div class="val blue" id="s5">—</div></div>
+    <div class="sc"><div class="lbl">💬 Text Queue</div><div class="val red" id="s6">—</div></div>
+  </div>
+
+  <!-- Users -->
+  <div class="sec">
+    <div class="sec-title">👤 Registered Users</div>
+    <div id="user-table"><div class="none">Loading...</div></div>
+  </div>
+
+  <!-- Reports -->
+  <div class="sec">
+    <div class="sec-title">🚩 Reports</div>
+    <div id="rep-table"><div class="none">Loading...</div></div>
+  </div>
+
+  <!-- Links -->
+  <div class="sec">
+    <div class="sec-title">🔗 Quick Links</div>
+    <div class="qlinks">
+      <a class="ql" href="/" target="_blank">🌐 Website</a>
+      <a class="ql" href="https://dashboard.render.com" target="_blank">☁️ Render</a>
+      <a class="ql" href="https://uptimerobot.com" target="_blank">📡 UptimeRobot</a>
+    </div>
+  </div>
+</div>
+
+<script>
+let pwd = "";
+
+async function login() {
+  pwd = document.getElementById("pwd").value;
+  const ok = await load(true);
+  if (!ok) { document.getElementById("err").style.display="block"; pwd=""; }
+}
+
+async function load(isLogin=false) {
+  try {
+    const r = await fetch("/api/admin/stats",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pwd})});
+    if (r.status===401) return false;
+    const d = await r.json();
+
+    if (isLogin) { document.getElementById("login-page").style.display="none"; document.getElementById("dash").style.display="block"; }
+
+    document.getElementById("s1").textContent = d.onlineNow;
+    document.getElementById("s2").textContent = d.totalUsers;
+    document.getElementById("s3").textContent = d.totalConnections;
+    document.getElementById("s4").textContent = d.totalChats;
+    document.getElementById("s5").textContent = d.waitingVideo;
+    document.getElementById("s6").textContent = d.waitingText;
+
+    // Uptime
+    const m=Math.floor(d.uptime/60),h=Math.floor(m/60);
+    document.getElementById("upd").textContent="Uptime: "+(h>0?h+"h ":"")+m%60+"m | Updated: "+new Date().toLocaleTimeString("en-IN");
+
+    // Users
+    const ut = document.getElementById("user-table");
+    if (!d.userList||d.userList.length===0) {
+      ut.innerHTML='<div class="none">Koi registered user nahi hai abhi.</div>';
+    } else {
+      ut.innerHTML=`<table><thead><tr><th>Username</th><th>Email</th><th>Joined</th><th>Chats</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>${d.userList.map(u=>`<tr>
+          <td><b>${u.username}</b></td>
+          <td style="color:var(--muted)">${u.email}</td>
+          <td style="color:var(--muted);font-size:.78rem">${new Date(u.joinedAt).toLocaleDateString("en-IN")}</td>
+          <td>${u.totalChats}</td>
+          <td><span class="badge ${u.isBanned?'red':'green'}">${u.isBanned?'Banned':'Active'}</span></td>
+          <td><button class="${u.isBanned?'unban-btn':'ban-btn'}" onclick="toggleBan('${u.id}','${u.username}')">${u.isBanned?'Unban':'Ban'}</button></td>
+        </tr>`).join("")}</tbody></table>`;
+    }
+
+    // Reports
+    const rt = document.getElementById("rep-table");
+    if (!d.reports||d.reports.length===0) {
+      rt.innerHTML='<div class="none">✅ Koi report nahi!</div>';
+    } else {
+      const rev=[...d.reports].reverse();
+      rt.innerHTML=`<table><thead><tr><th>#</th><th>Reason</th><th>Reporter</th><th>Time</th></tr></thead>
+        <tbody>${rev.map((r,i)=>`<tr>
+          <td style="color:var(--muted)">${rev.length-i}</td>
+          <td><span class="badge red">${r.reason}</span></td>
+          <td style="color:var(--muted)">${r.reporterName||"?"}</td>
+          <td style="color:var(--muted);font-size:.78rem">${new Date(r.time).toLocaleString("en-IN")}</td>
+        </tr>`).join("")}</tbody></table>`;
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
+async function toggleBan(userId, username) {
+  if (!confirm(`${username} ko ban/unban karna chahte ho?`)) return;
+  const r = await fetch("/api/admin/ban",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pwd,userId})});
+  const d = await r.json();
+  alert(d.isBanned ? username+" ban ho gaya!" : username+" unban ho gaya!");
+  load();
+}
+
+function out() { pwd=""; document.getElementById("dash").style.display="none"; document.getElementById("login-page").style.display="flex"; document.getElementById("pwd").value=""; }
+
+setInterval(()=>{ if(pwd&&document.getElementById("dash").style.display!=="none") load(); },15000);
+</script>
+</body>
+</html>
