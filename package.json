@@ -1,19 +1,23 @@
 {
-  "name": "meetmeup",
-  "version": "3.0.0",
-  "description": "MeetMeUp - Random Video & Text Chat",
-  "main": "server.js",
+  "name": "straniq",
+  "version": "1.0.0",
+  "description": "Straniq - Safe Random Chat Platform",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/app.js"
   },
   "dependencies": {
     "express": "4.18.2",
     "socket.io": "4.6.1",
     "uuid": "9.0.0",
     "bcryptjs": "2.4.3",
-    "jsonwebtoken": "9.0.0"
+    "jsonwebtoken": "9.0.0",
+    "nodemailer": "6.9.7",
+    "express-rate-limit": "6.10.0",
+    "helmet": "7.1.0",
+    "cors": "2.8.5",
+    "express-validator": "7.0.1",
+    "axios": "1.6.2"
   },
-  "engines": {
-    "node": "18.x"
-  }
+  "engines": { "node": "18.x" }
 }
